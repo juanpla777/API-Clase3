@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usuarios de ReqRes</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f483;
+      }
+      #filter-input {
+        padding: 8px;
+        margin-top: 10px;
+        width: 100%;
+        max-width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Lista de Usuarios</h1>
+
+    <input type="text" id="filter-input" placeholder="Filtrar por nombre..." />
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Avatar</th>
+        </tr>
+      </thead>
+      <tbody id="user-table-body"></tbody>
+    </table>
+
+    <script src="llamadaAsyncAwait.js"></script>
+    <script>
+      let allUsers = [];
+
+      async function loadUsers() {
+        try {
+          const response = await getData();
+          allUsers = response.data;
+          renderUsers(allUsers);
+        } catch (error) {
+          console.error("Error cargando usuarios:", error);
+        }
+      }
+
+      function renderUsers(users) {
+        const tableBody = document.getElementById("user-table-body");
+        tableBody.innerHTML = "";
+
+        users.forEach((user) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.first_name} ${user.last_name}</td>
+            <td>${user.email}</td>
+            <td><img src="${user.avatar}" width="50" height="50" alt="Avatar"></td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+      document.getElementById("filter-input").addEventListener("input", (e) => {
+        const search = e.target.value.toLowerCase();
+        const filteredUsers = allUsers.filter((user) =>
+          `${user.first_name} ${user.last_name}`.toLowerCase().includes(search)
+        );
+        renderUsers(filteredUsers);
+      });
+
+      loadUsers();
+    </script>
+  </body>
+</html>
